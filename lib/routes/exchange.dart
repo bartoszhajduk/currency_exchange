@@ -112,7 +112,7 @@ class _ExchangeState extends State<Exchange> {
                 color: Colors.indigo,
               ),
               child: IconButton(
-                onPressed: () => print('hello'),
+                onPressed: () => swapCurrencies(),
                 color: Colors.white,
                 icon: Icon(Icons.autorenew),
               ),
@@ -169,8 +169,19 @@ class _ExchangeState extends State<Exchange> {
 
   List<Currency> searchCurrencyByContains(String query) {
     return currencyList
-        .where(
-            (currency) => currency.currencyName.toLowerCase().contains(query))
+        .where((currency) =>
+            currency.currencyName.toLowerCase().contains(query.toLowerCase()))
         .toList();
+  }
+
+  void swapCurrencies() {
+    String tmp = fromCurrency.text;
+
+    setState(() {
+      fromCurrency.text = toCurrency.text;
+      toCurrency.text = tmp;
+    });
+
+    // TODO: Update conversion result
   }
 }
