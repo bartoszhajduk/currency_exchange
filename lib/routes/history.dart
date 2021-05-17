@@ -111,7 +111,7 @@ class _HistoryState extends State<History> {
 
                 /// * * * CHART * * *
                 CurrChart(
-                  height: 400,
+                  height: screenHeight / 1.7,
                   separatorWidth: 0.3,
                   width: screenWidth - screenPadding * 2,
                   onPressed: (index, value) {
