@@ -13,8 +13,9 @@ class _ExchangeState extends State<Exchange> {
   final amount = TextEditingController();
   final fromCurrency = TextEditingController();
   final toCurrency = TextEditingController();
-  List<Currency> currencyList = [];
+  final showResult = TextEditingController();
 
+  List<Currency> currencyList = [];
   @override
   void initState() {
     super.initState();
@@ -29,11 +30,22 @@ class _ExchangeState extends State<Exchange> {
     );
   }
 
+void getResult(String amount_, String from_, String to_) async {
+   String from = currencyList.firstWhere((element) => element.currencyName == fromCurrency.text).id;
+   String to = currencyList.firstWhere((element) => element.currencyName == toCurrency.text).id;
+    await Api.getCompact('${from}_${to}', amount_).then(
+      (value) => setState(() {
+        showResult.text = value.toStringAsFixed(2);
+      }),
+    );
+  }
+
   @override
   void dispose() {
     amount.dispose();
     fromCurrency.dispose();
     toCurrency.dispose();
+    showResult.dispose();
     super.dispose();
   }
 
@@ -49,6 +61,7 @@ class _ExchangeState extends State<Exchange> {
             Padding(
               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
               child: TextField(
+                controller: amount,
                 textAlign: TextAlign.center,
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
@@ -161,9 +174,38 @@ class _ExchangeState extends State<Exchange> {
                 noItemsFoundBuilder: (context) => Text('Nothing found'),
               ),
             ),
+            Ink(
+              decoration: ShapeDecoration(
+                shape: CircleBorder(),
+                color: Colors.indigo,
+              ),
+              child: IconButton(
+                onPressed: () => getConversionResult(amount.text, fromCurrency.text, toCurrency.text),
+                color: Colors.white,
+                icon: Icon(Icons.approval)
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+              child: TextField(
+               
+                  controller: showResult,
+                  enabled: false,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                  fontSize: 25,
+                ),
+              
+               
+                )
+                
+               
+              ),
+            
           ],
         ),
       ),
+      
     );
   }
 
@@ -181,7 +223,10 @@ class _ExchangeState extends State<Exchange> {
       fromCurrency.text = toCurrency.text;
       toCurrency.text = tmp;
     });
-
-    // TODO: Update conversion result
+  }
+  void getConversionResult(String amount, String from_curr, String to_curr){
+    setState((){
+      getResult(amount, from_curr, to_curr);
+    });
   }
 }

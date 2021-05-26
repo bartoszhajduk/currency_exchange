@@ -9,7 +9,7 @@ class Api {
   static const pathCurrencies = '/api/v7/currencies';
   static const pathConvert = '/api/v7/convert';
   static const apiKey = '0e2f68cc1f063d6c3144';
-
+  static const compact = 'ultra';
   static Future<List<Currency>> getCurrencies() async {
     final url = Uri.https(apiUrl, pathCurrencies, {'apiKey': apiKey});
     final response = await http.get(url);
@@ -20,6 +20,19 @@ class Api {
       final currencyList =
           keyList.keys.map((key) => Currency.fromJson(keyList[key])).toList();
       return keyList != null ? currencyList : List.empty();
+    } else {
+      throw Exception('Failed to load currencies');
+    }
+  }
+
+  static Future<double> getCompact(String q, String amount ) async {
+    final url = Uri.https(apiUrl, pathConvert, {'apiKey': apiKey, 'q': q, 'compact': compact});
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final result = jsonDecode(response.body)[q];
+     
+      return double.parse(amount)* result;
     } else {
       throw Exception('Failed to load currencies');
     }
