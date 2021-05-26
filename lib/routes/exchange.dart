@@ -30,20 +30,26 @@ class _ExchangeState extends State<Exchange> {
     );
   }
 
-void getConversionResult(String amount) async {
-   if (!(currencyList.any((element) => element.currencyName == fromCurrency.text) && currencyList.any((element) => element.currencyName == toCurrency.text))){
-     showResult.text = "Incorrect currency";
-   }
-   else if (amount.isEmpty)
+  void getConversionResult(String amount) async {
+    if (!(currencyList
+            .any((element) => element.currencyName == fromCurrency.text) &&
+        currencyList
+            .any((element) => element.currencyName == toCurrency.text))) {
+      showResult.text = "Incorrect currency";
+    } else if (amount.isEmpty)
       showResult.text = "Incorrect value";
-  else {
-   String from = currencyList.firstWhere((element) => element.currencyName == fromCurrency.text).id;
-   String to = currencyList.firstWhere((element) => element.currencyName == toCurrency.text).id;
-    await Api.getConversionResult('${from}_${to}', amount).then(
-      (value) => setState(() {
-        showResult.text = value.toStringAsFixed(2);
-      }),
-    );
+    else {
+      String from = currencyList
+          .firstWhere((element) => element.currencyName == fromCurrency.text)
+          .id;
+      String to = currencyList
+          .firstWhere((element) => element.currencyName == toCurrency.text)
+          .id;
+      await Api.getConversionResult('${from}_${to}', amount).then(
+        (value) => setState(() {
+          showResult.text = value.toStringAsFixed(2);
+        }),
+      );
     }
   }
 
@@ -181,38 +187,30 @@ void getConversionResult(String amount) async {
                 noItemsFoundBuilder: (context) => Text('Nothing found'),
               ),
             ),
-            Ink(
-              decoration: ShapeDecoration(
-                shape: CircleBorder(),
-                color: Colors.indigo,
-              ),
-              child: IconButton(
+            ElevatedButton(
                 onPressed: () => setConversionResult(amount.text),
-                color: Colors.white,
-                icon: Icon(Icons.approval)
-              ),
-            ),
+                child: Text('Calculate',
+                    style: new TextStyle(
+                      fontSize: 25,
+                    )),
+                style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Colors.indigo),
+                    foregroundColor:
+                        MaterialStateProperty.all<Color>(Colors.white))),
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-              child: TextField(
-               
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                child: TextField(
                   controller: showResult,
                   enabled: false,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                  fontSize: 25,
-                ),
-              
-               
-                )
-                
-               
-              ),
-            
+                    fontSize: 25,
+                  ),
+                )),
           ],
         ),
       ),
-      
     );
   }
 
@@ -231,8 +229,9 @@ void getConversionResult(String amount) async {
       toCurrency.text = tmp;
     });
   }
-  void setConversionResult(String amount){
-    setState((){
+
+  void setConversionResult(String amount) {
+    setState(() {
       getConversionResult(amount);
     });
   }

@@ -25,12 +25,13 @@ class Api {
     }
   }
 
-  static Future<double> getConversionResult(String q, String amount ) async {
-    final url = Uri.https(apiUrl, pathConvert, {'apiKey': apiKey, 'q': q, 'compact': compact});
+  static Future<double> getConversionResult(String q, String amount) async {
+    final url = Uri.https(
+        apiUrl, pathConvert, {'apiKey': apiKey, 'q': q, 'compact': compact});
     final response = await http.get(url);
     if (response.statusCode == 200) {
       final result = jsonDecode(response.body)[q];
-      return double.parse(amount)* result;
+      return double.parse(amount) * result;
     } else {
       throw Exception('Failed to convert');
     }
