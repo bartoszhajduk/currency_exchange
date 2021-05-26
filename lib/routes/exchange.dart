@@ -30,14 +30,21 @@ class _ExchangeState extends State<Exchange> {
     );
   }
 
-void getResult(String amount_, String from_, String to_) async {
+void getConversionResult(String amount) async {
+   if (!(currencyList.any((element) => element.currencyName == fromCurrency.text) && currencyList.any((element) => element.currencyName == toCurrency.text))){
+     showResult.text = "Incorrect currency";
+   }
+   else if (amount.isEmpty)
+      showResult.text = "Incorrect value";
+  else {
    String from = currencyList.firstWhere((element) => element.currencyName == fromCurrency.text).id;
    String to = currencyList.firstWhere((element) => element.currencyName == toCurrency.text).id;
-    await Api.getCompact('${from}_${to}', amount_).then(
+    await Api.getConversionResult('${from}_${to}', amount).then(
       (value) => setState(() {
         showResult.text = value.toStringAsFixed(2);
       }),
     );
+    }
   }
 
   @override
@@ -180,7 +187,7 @@ void getResult(String amount_, String from_, String to_) async {
                 color: Colors.indigo,
               ),
               child: IconButton(
-                onPressed: () => getConversionResult(amount.text, fromCurrency.text, toCurrency.text),
+                onPressed: () => setConversionResult(amount.text),
                 color: Colors.white,
                 icon: Icon(Icons.approval)
               ),
@@ -224,9 +231,9 @@ void getResult(String amount_, String from_, String to_) async {
       toCurrency.text = tmp;
     });
   }
-  void getConversionResult(String amount, String from_curr, String to_curr){
+  void setConversionResult(String amount){
     setState((){
-      getResult(amount, from_curr, to_curr);
+      getConversionResult(amount);
     });
   }
 }
