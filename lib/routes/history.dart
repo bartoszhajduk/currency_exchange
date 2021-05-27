@@ -18,6 +18,7 @@ class _HistoryState extends State<History> {
   String textValue = '';
   List<Historical> values = <Historical>[];
   List<Currency> currencies = <Currency>[];
+  int selectedIndex = 0;
 
   void loadCurrencyList() async {
     final data = await Api.getCurrencies();
@@ -111,11 +112,12 @@ class _HistoryState extends State<History> {
 
                 /// * * * CHART * * *
                 CurrChart(
-                  height: screenHeight / 1.7,
+                  height: screenHeight / 2,
                   separatorWidth: 0.3,
                   width: screenWidth - screenPadding * 2,
                   onPressed: (index, value) {
                     setState(() {
+                      selectedIndex = index;
                       textDate = values[index].date;
                       textValue = values[index].value.toString();
                     });
@@ -123,6 +125,7 @@ class _HistoryState extends State<History> {
                   values: values.map((e) => e.value).toList(),
                   barColor: AppColors.lightPrimary,
                   selectedBarColor: AppColors.darkPrimary,
+                  selected: selectedIndex,
                 ),
 
                 /// * * * VALUE DESCRIPTION * * *
@@ -145,6 +148,67 @@ class _HistoryState extends State<History> {
                           fontSize: 20.0,
                         ),
                       ),
+                    ],
+                  ),
+                ),
+
+                /// * * * TABLE * * *
+                SizedBox(
+                  width: double.infinity,
+                  child: DataTable(
+                    showCheckboxColumn: false,
+                    columns: const <DataColumn>[
+                      DataColumn(
+                        label: Text(
+                          'Date',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      ),
+                      DataColumn(
+                        label: Text(
+                          'Value',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      ),
+                    ],
+                    rows: [
+                      for (var i = 0; i < values.length; i++)
+                        DataRow(
+                          onSelectChanged: (_) => setState(() {
+                            selectedIndex = i;
+                          }),
+                          selected: i == selectedIndex,
+                          color: MaterialStateProperty.resolveWith<Color>(
+                              (states) {
+                            if (states.contains(MaterialState.selected))
+                              return AppColors.darkPrimary;
+                            return null;
+                          }),
+                          cells: [
+                            DataCell(
+                              Text(
+                                values[i].date,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: i == selectedIndex
+                                      ? Colors.white
+                                      : Colors.black,
+                                ),
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                '${values[i].value.toString()} $toCurrency',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: i == selectedIndex
+                                      ? Colors.white
+                                      : Colors.black,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                     ],
                   ),
                 ),

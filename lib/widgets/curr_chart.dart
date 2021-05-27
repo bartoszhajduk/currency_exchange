@@ -11,12 +11,14 @@ class CurrChart extends StatefulWidget {
   final Color selectedBarColor;
   final double barRadiusValue;
   final double separatorWidth;
+  final int selected;
 
   CurrChart({
     this.values = const [],
     @required this.height,
     @required this.width,
     @required this.onPressed,
+    @required this.selected,
     this.backgroundColor = Colors.white,
     this.barColor = Colors.grey,
     this.selectedBarColor = Colors.blue,
@@ -29,8 +31,6 @@ class CurrChart extends StatefulWidget {
 }
 
 class _CurrChartState extends State<CurrChart> {
-  int tappedIndex = 0;
-
   @override
   Widget build(BuildContext context) {
     final maxVal = widget.values.isNotEmpty ? findMaxValue() : 0;
@@ -50,9 +50,6 @@ class _CurrChartState extends State<CurrChart> {
               ((entry.value - shift) * widget.height) / (maxVal - shift);
           return GestureDetector(
             onTap: () {
-              setState(() {
-                tappedIndex = entry.key;
-              });
               widget.onPressed(entry.key, entry.value);
             },
             child: Stack(
@@ -71,7 +68,7 @@ class _CurrChartState extends State<CurrChart> {
                       (widget.separatorWidth * widget.values.length),
                   height: filledHeight,
                   decoration: BoxDecoration(
-                    color: entry.key == tappedIndex
+                    color: entry.key == widget.selected
                         ? widget.selectedBarColor
                         : widget.barColor,
                     borderRadius: BorderRadius.only(

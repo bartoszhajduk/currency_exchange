@@ -13,7 +13,7 @@ class _ExchangeState extends State<Exchange> {
   final amount = TextEditingController();
   final fromCurrency = TextEditingController();
   final toCurrency = TextEditingController();
-  final showResult = TextEditingController();
+  String result = '';
 
   List<Currency> currencyList = [];
   @override
@@ -35,9 +35,9 @@ class _ExchangeState extends State<Exchange> {
             .any((element) => element.currencyName == fromCurrency.text) &&
         currencyList
             .any((element) => element.currencyName == toCurrency.text))) {
-      showResult.text = "Incorrect currency";
+      result = "Incorrect currency";
     } else if (amount.isEmpty)
-      showResult.text = "Incorrect value";
+      result = "Incorrect value";
     else {
       String from = currencyList
           .firstWhere((element) => element.currencyName == fromCurrency.text)
@@ -47,7 +47,7 @@ class _ExchangeState extends State<Exchange> {
           .id;
       await Api.getConversionResult('${from}_${to}', amount).then(
         (value) => setState(() {
-          showResult.text = value.toStringAsFixed(2);
+          result = value.toStringAsFixed(2);
         }),
       );
     }
@@ -58,7 +58,6 @@ class _ExchangeState extends State<Exchange> {
     amount.dispose();
     fromCurrency.dispose();
     toCurrency.dispose();
-    showResult.dispose();
     super.dispose();
   }
 
@@ -200,9 +199,8 @@ class _ExchangeState extends State<Exchange> {
                         MaterialStateProperty.all<Color>(Colors.white))),
             Padding(
                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                child: TextField(
-                  controller: showResult,
-                  enabled: false,
+                child: SelectableText(
+                  result,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 25,
