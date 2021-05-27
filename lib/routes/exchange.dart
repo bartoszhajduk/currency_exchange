@@ -17,6 +17,7 @@ class _ExchangeState extends State<Exchange> {
   final result = TextEditingController();
   //String result = '';
   bool isSwapping = false;
+  bool isLoading = false;
   List<Currency> currencyList = [];
   double currentRate;
 
@@ -54,16 +55,15 @@ class _ExchangeState extends State<Exchange> {
   bool areCurrenciesSelected() =>
       fromCurrency.text.isNotEmpty && toCurrency.text.isNotEmpty;
 
-  void getConversionResult() async {
+  Future<void> getConversionResult() async {
     setState(() {
       result.text =
           (double.parse(amount.text) * currentRate).toStringAsFixed(2);
     });
   }
 
-  void getConversionRate() async {
-    print(amount.text);
-
+  Future<void> getConversionRate() async {
+    isLoading = true;
     if (!(currencyList.any((element) => element.id == fromCurrency.text) &&
         currencyList.any((element) => element.id == toCurrency.text))) {
       result.text = "Incorrect currency";
@@ -82,6 +82,7 @@ class _ExchangeState extends State<Exchange> {
         }),
       );
     }
+    isLoading = false;
   }
 
   @override
@@ -259,39 +260,44 @@ class _ExchangeState extends State<Exchange> {
                 ),
                 !isAmountEntered() || !areCurrenciesSelected()
                     ? Container()
-                    : Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        child: Card(
-                          child: Container(
-                            width: double.infinity,
-                            child: Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Column(
-                                children: [
-                                  Text(
-                                      '${format(amount.text)} ${fromCurrency.text} ='),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 16),
-                                    child: SelectableText(
-                                      '${result.text} ${toCurrency.text}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20,
+                    : isLoading
+                        ? Padding(
+                            padding: const EdgeInsets.only(top: 16),
+                            child: CircularProgressIndicator(),
+                          )
+                        : Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            child: Card(
+                              child: Container(
+                                width: double.infinity,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                          '${format(amount.text)} ${fromCurrency.text} ='),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 16),
+                                        child: SelectableText(
+                                          '${result.text} ${toCurrency.text}',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20,
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                      Text(
+                                        'Rate 1 ${fromCurrency.text} = ${currentRate.toStringAsFixed(2)} ${toCurrency.text}',
+                                        style: TextStyle(
+                                            color: AppColors.darkPrimary),
+                                      )
+                                    ],
                                   ),
-                                  Text(
-                                    'Rate 1 ${fromCurrency.text} = ${currentRate.toStringAsFixed(2)} ${toCurrency.text}',
-                                    style:
-                                        TextStyle(color: AppColors.darkPrimary),
-                                  )
-                                ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ),
               ],
             ),
           ),
@@ -307,7 +313,7 @@ class _ExchangeState extends State<Exchange> {
         .toList();
   }
 
-  void swapCurrencies() {
+  void swapCurrencies() async {
     isSwapping = true;
     String tmp = fromCurrency.text;
 
@@ -319,7 +325,8 @@ class _ExchangeState extends State<Exchange> {
     isSwapping = false;
 
     if (isAmountEntered() && areCurrenciesSelected()) {
-      getConversionResult();
+      await getConversionRate();
+      await getConversionResult();
     }
   }
 
