@@ -198,6 +198,8 @@ class _HistoryState extends State<History> {
                                     DataRow(
                                       onSelectChanged: (_) => setState(() {
                                         selectedIndex = i;
+                                        textDate = values[i].date;
+                                        textValue = values[i].value.toString();
                                       }),
                                       selected: i == selectedIndex,
                                       color: MaterialStateProperty.resolveWith<
