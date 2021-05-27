@@ -248,6 +248,13 @@ class _ExchangeState extends State<Exchange> {
                       labelText: 'Amount',
                       border: OutlineInputBorder(),
                     ),
+                    onChanged: (value) {
+                      if (value.startsWith('.')) {
+                        amount.text = '0' + amount.text;
+                        amount.selection =
+                            TextSelection.collapsed(offset: amount.text.length);
+                      }
+                    },
                   ),
                 ),
                 !isAmountEntered() || !areCurrenciesSelected()
