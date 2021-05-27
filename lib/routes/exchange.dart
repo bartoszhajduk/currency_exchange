@@ -14,12 +14,29 @@ class _ExchangeState extends State<Exchange> {
   final fromCurrency = TextEditingController();
   final toCurrency = TextEditingController();
   String result = '';
-
+  bool isSwapping = false;
+  bool isLoading = false;
   List<Currency> currencyList = [];
+
   @override
   void initState() {
     super.initState();
     loadCurrencyList();
+    amount.addListener(() {
+      if (isPopulated() && !isSwapping) {
+        getConversionResult();
+      }
+    });
+    fromCurrency.addListener(() {
+      if (isPopulated() && !isSwapping) {
+        getConversionResult();
+      }
+    });
+    toCurrency.addListener(() {
+      if (isPopulated() && !isSwapping) {
+        getConversionResult();
+      }
+    });
   }
 
   void loadCurrencyList() async {
@@ -30,27 +47,36 @@ class _ExchangeState extends State<Exchange> {
     );
   }
 
-  void getConversionResult(String amount) async {
+  bool isPopulated() =>
+      amount.text.isNotEmpty &&
+      fromCurrency.text.isNotEmpty &&
+      toCurrency.text.isNotEmpty;
+
+  void getConversionResult() async {
+    isLoading = true;
+
     if (!(currencyList
             .any((element) => element.currencyName == fromCurrency.text) &&
         currencyList
             .any((element) => element.currencyName == toCurrency.text))) {
       result = "Incorrect currency";
-    } else if (amount.isEmpty)
-      result = "Incorrect value";
-    else {
+    } else {
       String from = currencyList
           .firstWhere((element) => element.currencyName == fromCurrency.text)
           .id;
       String to = currencyList
           .firstWhere((element) => element.currencyName == toCurrency.text)
           .id;
-      await Api.getConversionResult('${from}_${to}', amount).then(
+      await Api.getConversionResult('${from}_${to}', amount.text).then(
         (value) => setState(() {
-          result = value.toStringAsFixed(2);
+          setState(() {
+            result = value.toStringAsFixed(2);
+          });
         }),
       );
     }
+
+    isLoading = false;
   }
 
   @override
@@ -186,26 +212,17 @@ class _ExchangeState extends State<Exchange> {
                 noItemsFoundBuilder: (context) => Text('Nothing found'),
               ),
             ),
-            ElevatedButton(
-                onPressed: () => setConversionResult(amount.text),
-                child: Text('Calculate',
-                    style: new TextStyle(
-                      fontSize: 25,
-                    )),
-                style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all<Color>(Colors.indigo),
-                    foregroundColor:
-                        MaterialStateProperty.all<Color>(Colors.white))),
             Padding(
                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                child: SelectableText(
-                  result,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 25,
-                  ),
-                )),
+                child: isLoading
+                    ? CircularProgressIndicator()
+                    : SelectableText(
+                        result,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 25,
+                        ),
+                      )),
           ],
         ),
       ),
@@ -220,17 +237,18 @@ class _ExchangeState extends State<Exchange> {
   }
 
   void swapCurrencies() {
+    isSwapping = true;
     String tmp = fromCurrency.text;
 
     setState(() {
       fromCurrency.text = toCurrency.text;
       toCurrency.text = tmp;
     });
-  }
 
-  void setConversionResult(String amount) {
-    setState(() {
-      getConversionResult(amount);
-    });
+    isSwapping = false;
+
+    if (isPopulated()) {
+      getConversionResult();
+    }
   }
 }

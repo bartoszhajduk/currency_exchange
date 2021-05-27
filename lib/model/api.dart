@@ -8,7 +8,7 @@ class Api {
   static const apiUrl = 'free.currconv.com';
   static const pathCurrencies = '/api/v7/currencies';
   static const pathConvert = '/api/v7/convert';
-  static const apiKey = '0e2f68cc1f063d6c3144';
+  static const apiKey = 'c04411a2bf9b3efe4c60';
   static const compact = 'ultra';
 
   static Future<List<Currency>> getCurrencies() async {

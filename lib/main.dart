@@ -57,7 +57,10 @@ class _MyHomePageState extends State<MyHomePage> {
         currentIndex: _selectedIndex,
         onTap: _changePage,
       ),
-      body: _pages[_selectedIndex],
+      body: IndexedStack(
+        children: _pages,
+        index: _selectedIndex,
+      ),
     );
   }
 }
