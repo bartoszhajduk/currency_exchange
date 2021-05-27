@@ -8,7 +8,7 @@ class Api {
   static const apiUrl = 'free.currconv.com';
   static const pathCurrencies = '/api/v7/currencies';
   static const pathConvert = '/api/v7/convert';
-  static const apiKey = 'c04411a2bf9b3efe4c60';
+  static const apiKey = '0e2f68cc1f063d6c3144';
   static const compact = 'ultra';
 
   static Future<List<Currency>> getCurrencies() async {
@@ -19,19 +19,20 @@ class Api {
       final keyList = responseBody['results'] as Map;
       final currencyList =
           keyList.keys.map((key) => Currency.fromJson(keyList[key])).toList();
+      currencyList.sort((a, b) => a.id.compareTo(b.id));
       return keyList != null ? currencyList : List.empty();
     } else {
       throw Exception('Failed to load currencies');
     }
   }
 
-  static Future<double> getConversionResult(String q, String amount) async {
+  static Future<double> getConversionResult(String q) async {
     final url = Uri.https(
         apiUrl, pathConvert, {'apiKey': apiKey, 'q': q, 'compact': compact});
     final response = await http.get(url);
     if (response.statusCode == 200) {
       final result = jsonDecode(response.body)[q];
-      return double.parse(amount) * result;
+      return result;
     } else {
       throw Exception('Failed to convert');
     }
