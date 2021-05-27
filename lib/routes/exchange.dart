@@ -112,6 +112,7 @@ class _ExchangeState extends State<Exchange> {
                       Expanded(
                         child: TypeAheadField<Currency>(
                           textFieldConfiguration: TextFieldConfiguration(
+                            onTap: () => fromCurrency.clear(),
                             controller: fromCurrency,
                             decoration: InputDecoration(
                               filled: true,
@@ -177,6 +178,7 @@ class _ExchangeState extends State<Exchange> {
                       Expanded(
                         child: TypeAheadField<Currency>(
                           textFieldConfiguration: TextFieldConfiguration(
+                            onTap: () => toCurrency.clear(),
                             controller: toCurrency,
                             decoration: InputDecoration(
                               filled: true,
